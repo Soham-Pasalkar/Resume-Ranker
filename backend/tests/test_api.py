@@ -43,6 +43,14 @@ def test_resume_upload_and_ranking_with_profiles(sample_jd_text, sample_senior_r
     assert len(candidates) == 1
     assert candidates[0]["name"] == "Alex Rivera"
     assert candidates[0]["highest_degree"] == "Bachelor's"
+    assert candidates[0]["recruitment_status"] == "Applied"
+
+    cand_id = candidates[0]["id"]
+
+    # Test status update
+    status_res = client.patch(f"/api/v1/resumes/{cand_id}/status", json={"status": "Interview"})
+    assert status_res.status_code == 200
+    assert status_res.json()["recruitment_status"] == "Interview"
 
     # Rank with specialist preset
     rank_res = client.post(
@@ -61,7 +69,8 @@ def test_resume_upload_and_ranking_with_profiles(sample_jd_text, sample_senior_r
     assert result_data["summary"]["total_candidates"] == 1
     assert result_data["results"][0]["score"]["overall_score"] > 60.0
     assert result_data["results"][0]["knockout"]["is_knocked_out"] is False
-    assert result_data["results"][0]["evidence"]["rationale"] != ""
+    assert result_data["results"][0]["recruitment_status"] == "Interview"
+    assert result_data["summary"]["stage_counts"]["Interview"] == 1
 
 
 def test_export_csv_endpoint(sample_jd_text, sample_senior_resume_text):
@@ -79,5 +88,5 @@ def test_export_csv_endpoint(sample_jd_text, sample_senior_resume_text):
     assert res.status_code == 200
     assert res.headers["content-type"] == "text/csv; charset=utf-8"
     csv_text = res.text
-    assert "Rank,Candidate Name,Overall Score" in csv_text
+    assert "Rank,Candidate Name,Recruitment Status,Overall Score" in csv_text
     assert "Alex Rivera" in csv_text

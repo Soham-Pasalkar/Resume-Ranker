@@ -18,7 +18,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100">
+    <div className="flex min-h-screen flex-col bg-white text-zinc-900 transition-colors duration-200 dark:bg-zinc-950 dark:text-zinc-100">
       <Navbar
         onScrollToWorkspace={scrollToWorkspace}
         blindMode={blindMode}

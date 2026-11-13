@@ -4,6 +4,7 @@ import {
   JobDescriptionAnalysis,
   WeightProfile,
   KnockoutRules,
+  RecruitmentStage,
 } from "@/types";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -70,6 +71,21 @@ export async function rankCandidates(params: {
   });
   if (!res.ok) {
     throw new Error(`Failed to rank candidates: ${res.statusText}`);
+  }
+  return res.json();
+}
+
+export async function updateCandidateStatus(
+  candidateId: string,
+  status: RecruitmentStage
+): Promise<CandidateProfile> {
+  const res = await fetch(`${API_BASE}/api/v1/resumes/${candidateId}/status`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ status }),
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to update candidate status: ${res.statusText}`);
   }
   return res.json();
 }

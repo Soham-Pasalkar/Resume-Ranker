@@ -3,8 +3,8 @@ from typing import List
 
 
 class Settings(BaseModel):
-    PROJECT_NAME: str = "ResumeRank Enterprise API"
-    VERSION: str = "1.0.0"
+    PROJECT_NAME: str = "People Lens API"
+    VERSION: str = "1.2.0"
     API_V1_STR: str = "/api/v1"
     
     # CORS Origins (Allow local Next.js frontend)

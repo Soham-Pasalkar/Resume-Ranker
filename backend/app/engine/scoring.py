@@ -202,6 +202,7 @@ class RankingEngine:
                     score=breakdown,
                     evidence=evidence,
                     knockout=knockout_status,
+                    recruitment_status=cand.recruitment_status or "Applied",
                 ))
 
         # Sort: Non-knockouts first by score descending, then knockouts
@@ -218,12 +219,28 @@ class RankingEngine:
         avg = float(sum(r.score.overall_score for r in evaluated) / total) if total > 0 else 0.0
         top = evaluated[0].score.overall_score if total > 0 else 0.0
 
+        # Calculate recruitment stage counts
+        stage_counts = {
+            "Applied": 0,
+            "Shortlisted": 0,
+            "Interview": 0,
+            "Selected": 0,
+            "Rejected": 0,
+        }
+        for item in evaluated:
+            status = item.recruitment_status or "Applied"
+            if status in stage_counts:
+                stage_counts[status] += 1
+            else:
+                stage_counts["Applied"] += 1
+
         summary = RankingSummary(
             total_candidates=total,
             strong_matches=strong,
             average_score=round(avg, 1),
             top_score=round(top, 1),
             knockouts_count=knockouts_count,
+            stage_counts=stage_counts,
         )
 
         return RankingResponse(summary=summary, results=evaluated)

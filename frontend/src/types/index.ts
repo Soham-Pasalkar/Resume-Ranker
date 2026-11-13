@@ -1,3 +1,10 @@
+export type RecruitmentStage =
+  | "Applied"
+  | "Shortlisted"
+  | "Interview"
+  | "Selected"
+  | "Rejected";
+
 export interface ContactInfo {
   email?: string | null;
   phone?: string | null;
@@ -20,6 +27,7 @@ export interface CandidateProfile {
   sections: Record<string, string>;
   raw_text: string;
   is_anonymized: boolean;
+  recruitment_status?: RecruitmentStage;
 }
 
 export interface WeightProfile {
@@ -67,6 +75,7 @@ export interface RankedCandidate {
   score: ScoreBreakdown;
   evidence: CandidateEvidence;
   knockout: KnockoutStatus;
+  recruitment_status: RecruitmentStage;
 }
 
 export interface RankingSummary {
@@ -75,6 +84,7 @@ export interface RankingSummary {
   average_score: number;
   top_score: number;
   knockouts_count: number;
+  stage_counts?: Record<RecruitmentStage, number>;
 }
 
 export interface RankingResponse {

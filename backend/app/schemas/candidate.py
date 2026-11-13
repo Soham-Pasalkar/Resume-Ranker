@@ -24,3 +24,7 @@ class CandidateProfile(BaseModel):
     sections: Dict[str, str] = Field(default_factory=dict, description="Identified sections, e.g. experience, education")
     raw_text: str = ""
     is_anonymized: bool = False
+    recruitment_status: str = Field(
+        default="Applied",
+        description="Recruitment pipeline stage: Applied, Shortlisted, Interview, Selected, Rejected"
+    )

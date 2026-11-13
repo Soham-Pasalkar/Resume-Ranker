@@ -18,6 +18,12 @@ class InMemoryStore:
     def get_all_candidates(self) -> List[CandidateProfile]:
         return list(self._candidates.values())
 
+    def update_candidate_status(self, candidate_id: str, status: str) -> Optional[CandidateProfile]:
+        if candidate_id in self._candidates:
+            self._candidates[candidate_id].recruitment_status = status
+            return self._candidates[candidate_id]
+        return None
+
     def clear(self) -> None:
         self._candidates.clear()
         self._active_jd_text = ""

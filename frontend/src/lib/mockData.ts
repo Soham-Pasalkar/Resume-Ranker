@@ -17,10 +17,18 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
     average_score: 68.4,
     top_score: 91.2,
     knockouts_count: 1,
+    stage_counts: {
+      Applied: 1,
+      Shortlisted: 1,
+      Interview: 1,
+      Selected: 0,
+      Rejected: 1,
+    },
   },
   results: [
     {
       rank: 1,
+      recruitment_status: "Interview",
       candidate: {
         id: "cand-alex-rivera",
         filename: "Alex_Rivera_Staff_Engineer.pdf",
@@ -61,6 +69,7 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
         },
         raw_text: "Alex Rivera resume text...",
         is_anonymized: false,
+        recruitment_status: "Interview",
       },
       score: {
         overall_score: 91.2,
@@ -105,6 +114,7 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
     },
     {
       rank: 2,
+      recruitment_status: "Shortlisted",
       candidate: {
         id: "cand-elena-rostova",
         filename: "Elena_Rostova_Resume.pdf",
@@ -138,6 +148,7 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
         },
         raw_text: "Elena Rostova resume text...",
         is_anonymized: false,
+        recruitment_status: "Shortlisted",
       },
       score: {
         overall_score: 72.8,
@@ -178,6 +189,7 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
     },
     {
       rank: 3,
+      recruitment_status: "Applied",
       candidate: {
         id: "cand-marcus-chen",
         filename: "Marcus_Chen_CV.pdf",
@@ -200,6 +212,7 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
         },
         raw_text: "Marcus Chen resume text...",
         is_anonymized: false,
+        recruitment_status: "Applied",
       },
       score: {
         overall_score: 48.2,
@@ -238,6 +251,7 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
     },
     {
       rank: 4,
+      recruitment_status: "Rejected",
       candidate: {
         id: "cand-jordan-taylor",
         filename: "Jordan_Taylor_Intern.pdf",
@@ -259,6 +273,7 @@ export const MOCK_RANKING_RESPONSE: RankingResponse = {
         },
         raw_text: "Jordan Taylor resume text...",
         is_anonymized: false,
+        recruitment_status: "Rejected",
       },
       score: {
         overall_score: 18.5,

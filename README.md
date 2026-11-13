@@ -1,19 +1,20 @@
-# ResumeRank Enterprise · Production Hiring Intelligence Engine
+# People Lens · Production Hiring Intelligence Engine
 
-ResumeRank is an enterprise-grade candidate matching and ranking platform. It fuses **Dense Semantic Embeddings** with **Sparse BM25 Lexical Verification** via **Reciprocal Rank Fusion (RRF)**, evaluates **Hard Knockout Constraints**, extracts **Direct Text Evidence Citations**, and provides a **Blind Screening Mode** to eradicate hiring bias.
+People Lens is an enterprise-grade candidate matching, ranking, and pipeline platform. It fuses **Dense Semantic Embeddings** with **Sparse BM25 Lexical Verification** via **Reciprocal Rank Fusion (RRF)**, evaluates **Hard Knockout Constraints**, extracts **Direct Text Evidence Citations**, provides **Pipeline Stage Management**, and includes a **Blind Screening Mode** to eradicate hiring bias.
 
 ---
 
 ## Key Capabilities
 
-- **Editorial, Anti-Slop Next.js 16 UI**: Bespoke dark slate palette (`zinc-950`), subtle borders, crisp typography via Geist Sans/Mono, avoiding generic purple AI gradient templates.
+- **Editorial, Anti-Slop Next.js 16 UI**: Dual Dark and Light mode themes, subtle borders, crisp typography via Geist Sans/Mono, avoiding generic purple AI gradient templates.
+- **Candidate Pipeline Management**: Full Kanban board and leaderboard stage transitions (`Applied`, `Shortlisted`, `Interview`, `Selected`, `Rejected`) with persistent stage tracking and drag-and-drop.
 - **Dual Hybrid Fusion**: Combines semantic cosine similarity and Okapi BM25 lexical ranking into a unified relevance score.
 - **Section-Weighted Analysis**: Applies 2x weight to demonstrated hands-on accomplishments in Work Experience sections over passive skill listings.
 - **Grounded Evidence Engine**: Cites exact resume text excerpts justifying every match score—eliminating hallucinations.
 - **Hard Knockout Evaluation**: Enforces non-negotiable criteria (mandatory skills, minimum YOE, minimum degrees) with automated demotion.
 - **Blind Screening Mode**: One-click PII and institution redaction protecting against unconscious pedigree and age bias.
 - **Tailored Screening Questions**: Automatically synthesizes technical interview questions targeted at candidate skill gaps.
-- **Head-to-Head Comparison**: Compare 2 to 4 candidates side-by-side across all competencies and metrics.
+- **Head-to-Head Comparison**: Compare 2 to 4 candidates side-by-side across all competencies, pipeline stages, and metrics.
 
 ---
 

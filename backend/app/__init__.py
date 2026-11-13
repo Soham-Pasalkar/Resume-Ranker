@@ -1,1 +1,1 @@
-# ResumeRank Backend Application Package
+# People Lens Backend Application Package

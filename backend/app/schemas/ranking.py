@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional
+from typing import List, Optional, Dict
 from backend.app.schemas.candidate import CandidateProfile
 
 
@@ -59,6 +59,10 @@ class RankedCandidate(BaseModel):
     score: ScoreBreakdown
     evidence: CandidateEvidence
     knockout: KnockoutStatus = Field(default_factory=KnockoutStatus)
+    recruitment_status: str = Field(
+        default="Applied",
+        description="Recruitment pipeline stage: Applied, Shortlisted, Interview, Selected, Rejected"
+    )
 
 
 class RankingRequest(BaseModel):
@@ -77,6 +81,15 @@ class RankingSummary(BaseModel):
     average_score: float
     top_score: float
     knockouts_count: int = 0
+    stage_counts: Dict[str, int] = Field(
+        default_factory=lambda: {
+            "Applied": 0,
+            "Shortlisted": 0,
+            "Interview": 0,
+            "Selected": 0,
+            "Rejected": 0,
+        }
+    )
 
 
 class RankingResponse(BaseModel):

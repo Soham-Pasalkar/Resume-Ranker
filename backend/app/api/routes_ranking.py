@@ -75,6 +75,7 @@ async def export_ranking_csv(payload: RankingRequest):
     writer.writerow([
         "Rank",
         "Candidate Name",
+        "Recruitment Status",
         "Overall Score",
         "Match Level",
         "Semantic Score",
@@ -95,6 +96,7 @@ async def export_ranking_csv(payload: RankingRequest):
         writer.writerow([
             r.rank,
             r.candidate.name,
+            r.recruitment_status or r.candidate.recruitment_status or "Applied",
             r.score.overall_score,
             r.score.match_level,
             r.score.semantic_score,
@@ -115,5 +117,5 @@ async def export_ranking_csv(payload: RankingRequest):
     return Response(
         content=csv_data,
         media_type="text/csv",
-        headers={"Content-Disposition": 'attachment; filename="resume_rankings_report.csv"'}
+        headers={"Content-Disposition": 'attachment; filename="people_lens_report.csv"'}
     )

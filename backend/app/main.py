@@ -6,7 +6,7 @@ from backend.app.api import routes_health, routes_jobs, routes_resumes, routes_r
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
-    description="Enterprise-grade Resume & Candidate Intelligence API",
+    description="People Lens Enterprise Candidate Intelligence API",
     docs_url="/docs",
     redoc_url="/redoc",
 )

@@ -1,5 +1,6 @@
 import uuid
 from typing import List
+from pydantic import BaseModel
 from fastapi import APIRouter, UploadFile, File, Query, HTTPException
 from backend.app.schemas.candidate import CandidateProfile
 from backend.app.parsers.factory import DocumentParserFactory
@@ -13,6 +14,10 @@ from backend.app.nlp.taxonomy import extract_skills_from_text, extract_domains_f
 from backend.app.core.store import store
 
 router = APIRouter(prefix="/resumes", tags=["Resumes"])
+
+
+class StatusUpdateRequest(BaseModel):
+    status: str
 
 
 @router.post("/upload", response_model=List[CandidateProfile])
@@ -74,6 +79,7 @@ async def upload_resumes(
             sections=sections,
             raw_text=text_to_save,
             is_anonymized=anonymize,
+            recruitment_status="Applied",
         )
 
         store.save_candidate(profile)
@@ -86,6 +92,24 @@ async def upload_resumes(
 async def list_candidates():
     """Retrieve all currently queued candidates in memory."""
     return store.get_all_candidates()
+
+
+@router.patch("/{candidate_id}/status", response_model=CandidateProfile)
+async def update_candidate_status(candidate_id: str, payload: StatusUpdateRequest):
+    """
+    Update a candidate's recruitment pipeline status:
+    Applied, Shortlisted, Interview, Selected, Rejected.
+    """
+    valid_statuses = {"Applied", "Shortlisted", "Interview", "Selected", "Rejected"}
+    if payload.status not in valid_statuses:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid status '{payload.status}'. Must be one of: {sorted(list(valid_statuses))}"
+        )
+    candidate = store.update_candidate_status(candidate_id, payload.status)
+    if not candidate:
+        raise HTTPException(status_code=404, detail="Candidate not found.")
+    return candidate
 
 
 @router.delete("")

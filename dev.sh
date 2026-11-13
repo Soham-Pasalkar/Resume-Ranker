@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-echo "⚡ Starting ResumeRank Enterprise Development Environment..."
+echo "⚡ Starting People Lens Development Environment..."
 
 # Trap SIGINT/SIGTERM to kill child processes
 trap 'kill 0' EXIT
