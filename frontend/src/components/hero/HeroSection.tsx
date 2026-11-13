@@ -10,7 +10,10 @@ interface HeroSectionProps {
 
 export function HeroSection({ onGetStarted, onLoadSample }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden border-b border-zinc-200/80 dark:border-zinc-800/80 bg-zinc-50/50 dark:bg-zinc-950 px-4 py-16 sm:py-20 sm:px-6 lg:px-8 transition-colors">
+    <section
+      style={{ minHeight: "calc(100svh - var(--navbar-height, 4rem))" }}
+      className="relative flex flex-col justify-center overflow-hidden border-b border-zinc-200/80 bg-zinc-50/50 px-4 py-12 transition-colors sm:px-6 sm:py-16 lg:px-8 lg:py-8 dark:border-zinc-800/80 dark:bg-zinc-950"
+    >
       {/* Subtle architectural background grid */}
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.03] dark:opacity-[0.03]"
@@ -20,7 +23,7 @@ export function HeroSection({ onGetStarted, onLoadSample }: HeroSectionProps) {
         }}
       />
 
-      <div className="relative mx-auto max-w-7xl">
+      <div className="relative mx-auto w-full max-w-7xl">
         <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
           {/* Left Column: Core Value Proposition */}
           <div className="lg:col-span-7">

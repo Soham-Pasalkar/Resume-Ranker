@@ -5,6 +5,7 @@
 :root {
   --background: #ffffff;
   --foreground: #09090b;
+  --navbar-height: 4rem;
 }
 
 .dark {
