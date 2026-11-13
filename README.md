@@ -1,8 +1,13 @@
- <div align="center">
 
-# PEOPLE LENS
+<div align="center">
 
-### See Beyond Resumes. Discover the Right People.
+  <img
+    src="assets/people-lens-banner.png"
+    alt="People Lens - See Beyond Resumes. Discover the Right People."
+    width="100%"
+  />
+
+  <br/>
 
 **An intelligent candidate matching, ranking, and recruitment pipeline platform.**
 
