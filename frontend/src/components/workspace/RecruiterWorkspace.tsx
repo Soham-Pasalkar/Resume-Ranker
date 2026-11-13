@@ -46,6 +46,7 @@ import {
 } from "@/lib/mockData";
 import { CandidateModal } from "./CandidateModal";
 import { ComparisonModal } from "./ComparisonModal";
+import { ProcessingCompletionModal } from "./ProcessingCompletionModal";
 
 const STAGES: RecruitmentStage[] = [
   "Applied",
@@ -175,6 +176,10 @@ export function RecruiterWorkspace({
   const [inspectCandidate, setInspectCandidate] = useState<RankedCandidate | null>(null);
   const [selectedForCompare, setSelectedForCompare] = useState<string[]>([]);
   const [isCompareOpen, setIsCompareOpen] = useState(false);
+
+  // Completion Confirmation Modal State
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const [processedFileCount, setProcessedFileCount] = useState<number>(0);
 
   // Search filter
   const [searchQuery, setSearchQuery] = useState("");
@@ -324,6 +329,23 @@ export function RecruiterWorkspace({
     }
   };
 
+  // Navigation actions from completion modal
+  const handleViewLeaderboardFromModal = () => {
+    setShowCompletionModal(false);
+    setViewMode("leaderboard");
+    setTimeout(() => {
+      document.getElementById("pipeline-results")?.scrollIntoView({ behavior: "smooth" });
+    }, 150);
+  };
+
+  const handleViewPipelineFromModal = () => {
+    setShowCompletionModal(false);
+    setViewMode("pipeline");
+    setTimeout(() => {
+      document.getElementById("pipeline-results")?.scrollIntoView({ behavior: "smooth" });
+    }, 150);
+  };
+
   // Main Ranking Execution
   const handleExecuteRanking = async () => {
     if (!jdText.trim()) {
@@ -333,6 +355,8 @@ export function RecruiterWorkspace({
 
     setIsLoading(true);
     setErrorMsg(null);
+    const countToProcess = selectedFiles.length > 0 ? selectedFiles.length : 5;
+    setProcessedFileCount(countToProcess);
 
     const mandatoryList = mandatorySkillsInput
       .split(",")
@@ -358,9 +382,13 @@ export function RecruiterWorkspace({
         min_score_filter: minScoreFilter,
       });
 
-      setRankingData(applyPersistedStatuses(response));
+      const updated = applyPersistedStatuses(response);
+      setRankingData(updated);
+      setShowCompletionModal(true);
     } catch {
-      setRankingData(applyPersistedStatuses(MOCK_RANKING_RESPONSE));
+      const fallback = applyPersistedStatuses(MOCK_RANKING_RESPONSE);
+      setRankingData(fallback);
+      setShowCompletionModal(true);
     } finally {
       setIsLoading(false);
     }
@@ -857,7 +885,7 @@ export function RecruiterWorkspace({
 
       {/* Candidate Pipeline & Leaderboard Section */}
       {rankingData && (
-        <div className="mt-12 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900/30">
+        <div id="pipeline-results" className="mt-12 rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900/30">
           {/* Top Section Controls: View Switcher, Stage Filter Tabs, Search & Knockouts */}
           <div className="flex flex-col justify-between gap-4 border-b border-zinc-200 pb-5 transition-colors sm:flex-row sm:items-center dark:border-zinc-800">
             <div>
@@ -1334,6 +1362,17 @@ export function RecruiterWorkspace({
           blindMode={blindMode}
         />
       )}
+
+      {/* Resumes Processed Confirmation Modal */}
+      <ProcessingCompletionModal
+        isOpen={showCompletionModal}
+        onClose={() => setShowCompletionModal(false)}
+        rankingData={rankingData}
+        blindMode={blindMode}
+        onViewLeaderboard={handleViewLeaderboardFromModal}
+        onViewPipeline={handleViewPipelineFromModal}
+        processedCount={processedFileCount}
+      />
     </div>
   );
 }
