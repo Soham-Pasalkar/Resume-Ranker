@@ -1,5 +1,8 @@
+import io
+import csv
 from typing import Dict
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import Response
 from backend.app.schemas.ranking import RankingRequest, RankingResponse, WeightProfile
 from backend.app.engine.scoring import RankingEngine
 from backend.app.engine.constraints import PRESET_PROFILES
@@ -58,3 +61,59 @@ async def rank_resumes(payload: RankingRequest):
     )
 
     return ranking_result
+
+
+@router.post("/export/csv")
+async def export_ranking_csv(payload: RankingRequest):
+    """Export ranking results directly as a downloadable CSV report."""
+    ranking_result = await rank_resumes(payload)
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+
+    # Header
+    writer.writerow([
+        "Rank",
+        "Candidate Name",
+        "Overall Score",
+        "Match Level",
+        "Semantic Score",
+        "Skill Score",
+        "Experience Score",
+        "Domain Score",
+        "Detected YOE",
+        "Highest Degree",
+        "Institution",
+        "Matched Skills",
+        "Missing Skills",
+        "Knocked Out",
+        "Knockout Reasons",
+        "Executive Rationale"
+    ])
+
+    for r in ranking_result.results:
+        writer.writerow([
+            r.rank,
+            r.candidate.name,
+            r.score.overall_score,
+            r.score.match_level,
+            r.score.semantic_score,
+            r.score.skill_score,
+            r.score.experience_score,
+            r.score.domain_score,
+            r.candidate.detected_yoe,
+            r.candidate.highest_degree or "N/A",
+            r.candidate.institution or "N/A",
+            "; ".join(r.evidence.matched_skills),
+            "; ".join(r.evidence.missing_skills),
+            "YES" if r.knockout.is_knocked_out else "NO",
+            "; ".join(r.knockout.reasons),
+            r.evidence.rationale
+        ])
+
+    csv_data = output.getvalue()
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={"Content-Disposition": 'attachment; filename="resume_rankings_report.csv"'}
+    )

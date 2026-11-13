@@ -73,3 +73,20 @@ export async function rankCandidates(params: {
   }
   return res.json();
 }
+
+export async function exportRankingCsv(params: {
+  jd_text: string;
+  preset_profile?: string;
+  knockout_rules?: KnockoutRules;
+  blind_hiring_mode?: boolean;
+}): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/api/v1/ranking/export/csv`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) {
+    throw new Error(`Failed to export CSV: ${res.statusText}`);
+  }
+  return res.blob();
+}

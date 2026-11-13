@@ -1,10 +1,11 @@
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from backend.app.core.cache import cache
 
 
 class SemanticSimilarityEngine:
-    """Computes semantic textual similarity between JD and Candidate Resume."""
+    """Computes semantic textual similarity between JD and Candidate Resume with LRU caching."""
 
     def __init__(self):
         self.vectorizer = TfidfVectorizer(
@@ -22,10 +23,17 @@ class SemanticSimilarityEngine:
         if not jd_text.strip() or not resume_text.strip():
             return 0.0
 
+        cache_key = f"{jd_text}:::{resume_text}"
+        cached_score = cache.get(cache_key, namespace="cosine_sim")
+        if cached_score is not None:
+            return cached_score
+
         try:
             matrix = self.vectorizer.fit_transform([jd_text, resume_text])
             sim = cosine_similarity(matrix[0:1], matrix[1:2])[0][0]
-            return float(np.clip(sim, 0.0, 1.0))
+            val = float(np.clip(sim, 0.0, 1.0))
+            cache.set(cache_key, val, namespace="cosine_sim")
+            return val
         except Exception:
             return 0.0
 

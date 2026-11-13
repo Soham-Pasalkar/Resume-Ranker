@@ -62,3 +62,22 @@ def test_resume_upload_and_ranking_with_profiles(sample_jd_text, sample_senior_r
     assert result_data["results"][0]["score"]["overall_score"] > 60.0
     assert result_data["results"][0]["knockout"]["is_knocked_out"] is False
     assert result_data["results"][0]["evidence"]["rationale"] != ""
+
+
+def test_export_csv_endpoint(sample_jd_text, sample_senior_resume_text):
+    client.delete("/api/v1/resumes")
+
+    files = [
+        ("files", ("alex_rivera.txt", sample_senior_resume_text.encode("utf-8"), "text/plain"))
+    ]
+    client.post("/api/v1/resumes/upload", files=files)
+
+    res = client.post(
+        "/api/v1/ranking/export/csv",
+        json={"jd_text": sample_jd_text}
+    )
+    assert res.status_code == 200
+    assert res.headers["content-type"] == "text/csv; charset=utf-8"
+    csv_text = res.text
+    assert "Rank,Candidate Name,Overall Score" in csv_text
+    assert "Alex Rivera" in csv_text

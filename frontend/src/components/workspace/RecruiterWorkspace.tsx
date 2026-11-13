@@ -16,6 +16,7 @@ import {
   ShieldCheck,
   Scale,
   RefreshCw,
+  Download,
 } from "lucide-react";
 import {
   RankedCandidate,
@@ -142,7 +143,6 @@ export function RecruiterWorkspace({
     };
 
     try {
-      // If user uploaded real files, upload them to the backend first
       if (selectedFiles.length > 0) {
         await uploadResumes(selectedFiles, blindMode);
       }
@@ -157,11 +157,77 @@ export function RecruiterWorkspace({
 
       setRankingData(response);
     } catch {
-      // If backend call fails, fallback to realistic mock update so demo remains usable
       setRankingData(MOCK_RANKING_RESPONSE);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Export handlers
+  const handleExportCsv = () => {
+    if (!rankingData) return;
+    const rows = [
+      [
+        "Rank",
+        "Candidate Name",
+        "Overall Score",
+        "Match Level",
+        "Semantic Score",
+        "Skill Score",
+        "Experience Score",
+        "Domain Score",
+        "Detected YOE",
+        "Highest Degree",
+        "Institution",
+        "Matched Skills",
+        "Missing Skills",
+        "Knocked Out",
+        "Rationale"
+      ]
+    ];
+
+    rankingData.results.forEach((r) => {
+      rows.push([
+        r.rank.toString(),
+        blindMode ? `Candidate #${r.rank}` : r.candidate.name,
+        r.score.overall_score.toString(),
+        r.score.match_level,
+        r.score.semantic_score.toString(),
+        r.score.skill_score.toString(),
+        r.score.experience_score.toString(),
+        r.score.domain_score.toString(),
+        r.candidate.detected_yoe.toString(),
+        r.candidate.highest_degree || "N/A",
+        blindMode ? "Redacted" : (r.candidate.institution || "N/A"),
+        `"${r.evidence.matched_skills.join(", ")}"`,
+        `"${r.evidence.missing_skills.join(", ")}"`,
+        r.knockout.is_knocked_out ? "YES" : "NO",
+        `"${r.evidence.rationale.replace(/"/g, '""')}"`
+      ]);
+    });
+
+    const csvContent = rows.map((e) => e.join(",")).join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `resumerank_report_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleExportJson = () => {
+    if (!rankingData) return;
+    const jsonStr = JSON.stringify(rankingData, null, 2);
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `resumerank_data_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Checkbox toggle for comparison
@@ -200,14 +266,35 @@ export function RecruiterWorkspace({
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={handleLoadSample}
-            className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3.5 py-2 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-700 hover:text-white"
+            className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-700 hover:text-white"
           >
             <RefreshCw className="h-3.5 w-3.5 text-zinc-400" />
             Reload Sample Campaign
           </button>
+
+          {rankingData && (
+            <>
+              <button
+                onClick={handleExportCsv}
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-700 hover:text-white"
+                title="Download CSV Evaluation Report"
+              >
+                <Download className="h-3.5 w-3.5 text-blue-400" />
+                CSV Report
+              </button>
+              <button
+                onClick={handleExportJson}
+                className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 transition-colors hover:border-zinc-700 hover:text-white"
+                title="Download Structured JSON Results"
+              >
+                <Download className="h-3.5 w-3.5 text-emerald-400" />
+                JSON Data
+              </button>
+            </>
+          )}
 
           {selectedForCompare.length >= 2 && (
             <button

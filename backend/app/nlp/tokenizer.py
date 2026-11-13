@@ -5,6 +5,7 @@ import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
+from backend.app.core.cache import cache
 
 # Initialize NLTK safely
 for pkg in ["punkt", "punkt_tab", "stopwords", "wordnet"]:
@@ -18,13 +19,17 @@ lemmatizer = WordNetLemmatizer()
 
 def clean_and_tokenize(text: str) -> List[str]:
     """
-    NLP preprocessing pipeline:
+    NLP preprocessing pipeline with SHA-256 caching:
       1. Lowercase
       2. Normalize punctuation (retaining + and # for C++, C#)
       3. Tokenize
       4. Remove standard stopwords
       5. Lemmatize tokens
     """
+    cached_tokens = cache.get(text, namespace="tokens")
+    if cached_tokens is not None:
+        return cached_tokens
+
     text_lower = text.lower()
     text_clean = re.sub(r"[^a-z0-9\s\+\#]", " ", text_lower)
     try:
@@ -37,11 +42,14 @@ def clean_and_tokenize(text: str) -> List[str]:
     except Exception:
         stop_words = {"the", "and", "is", "in", "to", "of", "for", "with", "a", "an", "on", "at"}
 
-    return [
+    result = [
         lemmatizer.lemmatize(t)
         for t in tokens
         if t not in stop_words and len(t) > 1
     ]
+
+    cache.set(text, result, namespace="tokens")
+    return result
 
 
 def get_top_keywords(text: str, top_n: int = 15) -> List[str]:
