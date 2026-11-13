@@ -8,6 +8,7 @@ from backend.app.extractors.name import extract_candidate_name
 from backend.app.extractors.experience import extract_years_of_experience
 from backend.app.extractors.sections import segment_resume_sections
 from backend.app.extractors.anonymizer import anonymize_resume
+from backend.app.extractors.education import extract_education_info
 from backend.app.nlp.taxonomy import extract_skills_from_text, extract_domains_from_text
 from backend.app.core.store import store
 
@@ -21,7 +22,8 @@ async def upload_resumes(
 ):
     """
     Batch upload candidate resumes (PDF, DOCX, TXT).
-    Parses document structures, extracts candidate metadata, and indexes skills.
+    Parses document structures, extracts candidate metadata, education credentials,
+    and indexes skills.
     """
     if not files:
         raise HTTPException(status_code=400, detail="No files uploaded.")
@@ -34,7 +36,6 @@ async def upload_resumes(
         if not content_bytes:
             continue
 
-        # Extract text via layout-aware parser
         raw_text = DocumentParserFactory.extract_text(content_bytes, filename)
         if not raw_text.strip():
             continue
@@ -45,13 +46,19 @@ async def upload_resumes(
         skills = extract_skills_from_text(raw_text)
         domains = extract_domains_from_text(raw_text)
         sections = segment_resume_sections(raw_text)
+        edu_info = extract_education_info(raw_text, sections.get("education", ""))
 
         display_name = candidate_name
         text_to_save = raw_text
 
         if anonymize:
             display_name = f"Candidate-{str(uuid.uuid4())[:8].upper()}"
-            text_to_save = anonymize_resume(raw_text, candidate_name)
+            text_to_save = anonymize_resume(
+                raw_text,
+                candidate_name=candidate_name,
+                institution=edu_info["institution"] or "",
+                graduation_year=edu_info["graduation_year"]
+            )
 
         profile = CandidateProfile(
             id=str(uuid.uuid4()),
@@ -61,6 +68,9 @@ async def upload_resumes(
             detected_yoe=yoe,
             detected_skills=sorted(list(skills)),
             detected_domains=domains,
+            highest_degree=edu_info["highest_degree"],
+            institution=edu_info["institution"],
+            graduation_year=edu_info["graduation_year"],
             sections=sections,
             raw_text=text_to_save,
             is_anonymized=anonymize,

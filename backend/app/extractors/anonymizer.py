@@ -2,7 +2,12 @@ import re
 from backend.app.extractors.contact import EMAIL_REGEX, PHONE_REGEX, LINKEDIN_REGEX, GITHUB_REGEX
 
 
-def anonymize_resume(text: str, candidate_name: str = "") -> str:
+def anonymize_resume(
+    text: str,
+    candidate_name: str = "",
+    institution: str = "",
+    graduation_year: int = None
+) -> str:
     """
     Sanitize personal identifying information (PII) from resume text
     to support unbiased / blind hiring evaluations.
@@ -28,6 +33,14 @@ def anonymize_resume(text: str, candidate_name: str = "") -> str:
         for token in name_tokens:
             if len(token) > 2:
                 anonymized = re.sub(rf"\b{re.escape(token)}\b", "[REDACTED_NAME]", anonymized, flags=re.IGNORECASE)
+
+    # Redact institution if provided
+    if institution and len(institution) > 3:
+        anonymized = re.sub(rf"\b{re.escape(institution)}\b", "[REDACTED_INSTITUTION]", anonymized, flags=re.IGNORECASE)
+
+    # Redact graduation year if provided
+    if graduation_year:
+        anonymized = re.sub(rf"\b{graduation_year}\b", "[REDACTED_YEAR]", anonymized)
 
     # Redact potential gender pronouns
     anonymized = re.sub(r"\b(he|she|him|her|his|hers)\b", "[THEY/THEIR]", anonymized, flags=re.IGNORECASE)

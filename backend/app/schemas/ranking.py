@@ -21,12 +21,25 @@ class WeightProfile(BaseModel):
         )
 
 
+class KnockoutRules(BaseModel):
+    mandatory_skills: List[str] = Field(default_factory=list, description="Must-have skills")
+    min_yoe: Optional[float] = Field(default=None, description="Strict minimum years of experience required")
+    min_degree: Optional[str] = Field(default=None, description="Minimum degree, e.g. Bachelor's or Master's")
+    apply_penalty_instead: bool = Field(default=False, description="Apply heavy penalty instead of hard knockout")
+
+
+class KnockoutStatus(BaseModel):
+    is_knocked_out: bool = False
+    reasons: List[str] = Field(default_factory=list)
+
+
 class ScoreBreakdown(BaseModel):
     overall_score: float = Field(..., ge=0.0, le=100.0)
     semantic_score: float = Field(..., ge=0.0, le=100.0)
     skill_score: float = Field(..., ge=0.0, le=100.0)
     experience_score: float = Field(..., ge=0.0, le=100.0)
     domain_score: float = Field(..., ge=0.0, le=100.0)
+    rrf_score: Optional[float] = Field(default=None, description="Reciprocal Rank Fusion score")
     match_level: str = Field(..., description="'Strong Match', 'Moderate Match', or 'Weak Match'")
 
 
@@ -35,6 +48,7 @@ class CandidateEvidence(BaseModel):
     missing_skills: List[str]
     experience_note: str
     domain_note: str
+    rationale: str = Field(default="", description="Executive hiring rationale")
     key_citations: List[str] = Field(default_factory=list, description="Direct text excerpts supporting match")
     interview_questions: List[str] = Field(default_factory=list, description="Targeted technical screening questions")
 
@@ -44,12 +58,15 @@ class RankedCandidate(BaseModel):
     candidate: CandidateProfile
     score: ScoreBreakdown
     evidence: CandidateEvidence
+    knockout: KnockoutStatus = Field(default_factory=KnockoutStatus)
 
 
 class RankingRequest(BaseModel):
     jd_text: str = Field(..., min_length=20)
     candidate_ids: Optional[List[str]] = None
+    preset_profile: Optional[str] = Field(default="balanced", description="balanced, specialist, leadership, or generalist")
     weights: Optional[WeightProfile] = None
+    knockout_rules: Optional[KnockoutRules] = None
     blind_hiring_mode: bool = Field(default=False, description="Redact candidate names & PII during evaluation")
     min_score_filter: float = Field(default=0.0, ge=0.0, le=100.0)
 
@@ -59,6 +76,7 @@ class RankingSummary(BaseModel):
     strong_matches: int
     average_score: float
     top_score: float
+    knockouts_count: int = 0
 
 
 class RankingResponse(BaseModel):

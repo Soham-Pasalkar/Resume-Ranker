@@ -2,6 +2,8 @@ from backend.app.schemas.job import JobDescriptionRequest, JobDescriptionAnalysi
 from backend.app.schemas.candidate import CandidateProfile, ContactInfo
 from backend.app.schemas.ranking import (
     WeightProfile,
+    KnockoutRules,
+    KnockoutStatus,
     ScoreBreakdown,
     CandidateEvidence,
     RankedCandidate,
@@ -16,6 +18,8 @@ __all__ = [
     "CandidateProfile",
     "ContactInfo",
     "WeightProfile",
+    "KnockoutRules",
+    "KnockoutStatus",
     "ScoreBreakdown",
     "CandidateEvidence",
     "RankedCandidate",
