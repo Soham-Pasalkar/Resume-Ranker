@@ -2,7 +2,7 @@
 <div align="center">
 
   <img
-    src="assets/people-lens-banner.png"
+    src="assets/logo.png"
     alt="People Lens - See Beyond Resumes. Discover the Right People."
     width="100%"
   />
